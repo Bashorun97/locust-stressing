@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  main:
+    container_name: locust-main
+    build:
+      context: ./
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./:/app/
+    command: |
+      bash -c 'locust -f /app/src/locustfile.py --master --config /app/src/locust.conf'
+    env_file:
+      - .env
+
+  workers:
+    volumes:
+      - ./:/app/
+    build:
+      context: ./
+    command: |
+      bash -c 'locust -f /app/src/locustfile.py --worker --master-host main --config /app/src/locust.conf'
+    env_file:
+      - .env
+    depends_on:
+      - main
